@@ -1,3 +1,3 @@
-/server
-/node_modules
-/.git
+server/
+shared/
+drizzle.config.ts
