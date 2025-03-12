@@ -15,6 +15,8 @@ export const events = pgTable("events", {
   status: text("status", { enum: ["upcoming", "ongoing", "completed"] }).notNull().default("upcoming"),
 });
 
+
+
 export const insertEventSchema = createInsertSchema(events)
   .pick({
     name: true,
