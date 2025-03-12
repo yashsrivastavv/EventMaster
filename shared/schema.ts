@@ -10,6 +10,7 @@ export const events = pgTable("events", {
   location: text("location").notNull(),
   description: text("description").notNull(),
   guestCapacity: integer("guest_capacity").notNull(),
+  guests: jsonb("guests").$type<string[]>().notNull(),
   agenda: jsonb("agenda").$type<string[]>().notNull(),
   status: text("status", { enum: ["upcoming", "ongoing", "completed"] }).notNull().default("upcoming"),
 });
@@ -22,12 +23,14 @@ export const insertEventSchema = createInsertSchema(events)
     location: true,
     description: true,
     guestCapacity: true,
+    guests: true,
     agenda: true
   })
   .extend({
     startDate: z.coerce.date(),
     duration: z.number().min(30).max(1440),
     guestCapacity: z.number().min(1).max(1000),
+    guests: z.array(z.string().email()),
     agenda: z.array(z.string()).min(1)
   });
 
