@@ -15,28 +15,68 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, PlusIcon, XIcon } from "lucide-react";
+import { CalendarIcon, PlusIcon, XIcon, ClockIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import * as z from 'zod';
+
+// Helper function to generate time options
+const generateTimeOptions = () => {
+  const options = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      options.push(time);
+    }
+  }
+  return options;
+};
 
 export default function CreateEvent() {
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
-  const form = useForm<InsertEvent>({
-    resolver: zodResolver(insertEventSchema),
+  const form = useForm<InsertEvent & { time: string }>({
+    resolver: zodResolver(insertEventSchema.extend({
+      time: z.string()
+    })),
     defaultValues: {
       agenda: [""],
-      guests: []
+      guests: [],
+      time: "09:00"
     }
   });
 
+  const timeOptions = generateTimeOptions();
+
+  // Watch values for summary
+  const location = form.watch("location");
+  const duration = form.watch("duration");
+
   const createEventMutation = useMutation({
-    mutationFn: async (data: InsertEvent) => {
-      const res = await apiRequest("POST", "/api/events", data);
+    mutationFn: async (data: InsertEvent & { time: string }) => {
+      // Combine date and time
+      const date = new Date(data.startDate);
+      const [hours, minutes] = data.time.split(':').map(Number);
+      date.setHours(hours, minutes);
+
+      const eventData = {
+        ...data,
+        startDate: date
+      };
+
+      const res = await apiRequest("POST", "/api/events", eventData);
       return res.json();
     },
     onSuccess: () => {
@@ -75,12 +115,12 @@ export default function CreateEvent() {
             )}
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <FormField
               control={form.control}
               name="startDate"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className="col-span-2">
                   <FormLabel>Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -120,24 +160,57 @@ export default function CreateEvent() {
 
             <FormField
               control={form.control}
-              name="duration"
+              name="time"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Duration (minutes)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      {...field} 
-                      onChange={e => field.onChange(parseInt(e.target.value))}
-                      min={30}
-                      max={1440}
-                    />
-                  </FormControl>
+                  <FormLabel>Time</FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select time" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {timeOptions.map((time) => (
+                        <SelectItem key={time} value={time}>
+                          {time}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="duration"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Duration (minutes)</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    {...field} 
+                    onChange={e => field.onChange(parseInt(e.target.value))}
+                    min={30}
+                    max={1440}
+                  />
+                </FormControl>
+                {location && duration && (
+                  <FormDescription className="text-sm text-muted-foreground mt-2">
+                    {location} will be booked for {duration} minutes
+                  </FormDescription>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
