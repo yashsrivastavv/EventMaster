@@ -17,7 +17,7 @@ export function EventFilter({ value, onChange }: EventFilterProps) {
     <div className="flex gap-4">
       <Select
         value={value.duration}
-        onValueChange={(duration) =>
+        onValueChange={(duration: EventFilter["duration"]) =>
           onChange({ ...value, duration: duration as EventFilter["duration"] })
         }
       >
@@ -33,7 +33,7 @@ export function EventFilter({ value, onChange }: EventFilterProps) {
 
       <Select
         value={value.status}
-        onValueChange={(status) =>
+        onValueChange={(status: EventFilter["status"]) =>
           onChange({ ...value, status: status as EventFilter["status"] })
         }
       >
