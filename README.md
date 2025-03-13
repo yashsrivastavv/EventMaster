@@ -28,8 +28,8 @@ Planit is a web application that allows users to create, view, and manage events
 
 ### 1️⃣ Clone the Repository
 ```sh
-git clone https://github.com/your-username/planit.git
-cd planit
+git clone https://github.com/yashsrivastavv/EventMaster
+cd EventMaster
 ```
 
 ### 2️⃣ Install Dependencies
