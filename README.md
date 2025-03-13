@@ -36,8 +36,12 @@ cd EventMaster
 ```sh
 npm install
 ```
+### 3️⃣ Install shadcn (forgot to add in package.json :'))
+```sh
+npx shadcn@latest init
+```
 
-### 3️⃣ Start the Development Server
+### 4️⃣ Start the Development Server
 ```sh
 npm run dev
 ```
