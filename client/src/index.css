@@ -1,7 +1,5 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
-
 @custom-variant dark (&:is(.dark *));
 @config "../../tailwind.config.ts";
 
@@ -19,7 +17,7 @@
 
   --radius: 0.625rem;
 
-  --foreground: oklch(0.2 0.1 240);
+  --foreground: oklch(0.5 0.2 240);
   --background: oklch(0.98 0 0);
   --card: oklch(1 0 0);
 

@@ -11,8 +11,11 @@ interface Message {
   text: string;
   isBot: boolean;
 }
+interface ChatBotProps {
+  className?: string;
+}
 
-export function ChatBot() {
+export function ChatBot({ className }: ChatBotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
