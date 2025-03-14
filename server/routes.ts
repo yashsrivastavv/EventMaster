@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertEventSchema, eventFilterSchema } from "@shared/schema";
 import { ZodError } from "zod";
+import fetch from "node-fetch";
+const CHATBOT_URL = "http://localhost:8000";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/events", async (req, res) => {
@@ -46,6 +48,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(event);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch event" });
+    }
+  });
+
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const response = await fetch(`${CHATBOT_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(req.body),
+      });
+
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to process chat message" });
+    }
+  });
+
+  app.delete("/api/chat/:sessionId", async (req, res) => {
+    try {
+      const response = await fetch(`${CHATBOT_URL}/chat/${req.params.sessionId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to end chat session" });
     }
   });
 
