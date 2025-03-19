@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertEventSchema, eventFilterSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
-const CHATBOT_URL = "http://localhost:10000";
+const CHATBOT_URL = "http://localhost:8000";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/events", async (req, res) => {
